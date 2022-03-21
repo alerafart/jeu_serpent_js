@@ -95,20 +95,20 @@ window.onload = function() {
   
   document.onkeydown = function handleKeyDown(e)
   {
-    var key = e.keyCode;
+    var key = e.key;
     var newDirection;
     switch(key)
     {
-      case 37:
+      case "ArrowLeft":
         newDirection = "left";
           break;
-      case 38:
+      case "ArrowUp":
         newDirection = "up";
           break;
-      case 39:
+      case "ArrowRight":
         newDirection = "right";
           break;
-      case 40:
+      case "ArrowDown":
         newDirection = "down";
           break;
       default:
