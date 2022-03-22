@@ -19,13 +19,12 @@ window.onload = function() {
     canvas.style.border = "1px solid";
     document.body.appendChild(canvas);
     ctx = canvas.getContext('2d');
-    snakee = new Snake([[6,4], [5,4], [4,4]], "right");
+    snakee = new Snake([[6,4], [5,4], [4,4], [3,4], [2,4]], "right");
     applee = new Apple([10,10]);
     refreshCanvas();
   }
 
   function refreshCanvas(){
-
     snakee.advance();
     if (snakee.checkCollission())
       {
@@ -36,6 +35,7 @@ window.onload = function() {
         if(snakee.isEatingApple(applee))
         {
           /* le serpent a mangé la pomme*/
+          snakee.ateApple = true;
           /* quand le serpent mange la pomme on lui donne une nouvelle position
           */
           do
@@ -65,6 +65,7 @@ window.onload = function() {
   function Snake(body, direction){
     this.body = body;
     this.direction = direction;
+    this.ateApple = false;
     this.draw = function()
     {
       ctx.save();
@@ -75,6 +76,11 @@ window.onload = function() {
       }
       ctx.restore();
     };
+    
+    /**
+     *  methode qui fais avancer le serpent
+     * on avance la tête d'une position et on enleve le dernier morceau/block avec pop
+     */
     this.advance = function()
     {
       var nextPosition = this.body[0].slice();
@@ -96,8 +102,22 @@ window.onload = function() {
           throw("Invalid Direction");
       }
       this.body.unshift(nextPosition);
-      this.body.pop();
+      if(!this.ateApple)
+        {/* si le serpent ne mange pas de pomme on 
+          supprime le dernier block lors qu'elle
+          avance, taille ne bouge pas*/
+          this.body.pop();
+        }
+        else{
+          /*si on tombe ici c'est que le serpent a mangé une pomme
+          donc on retire pas le dernier block a sa taille
+          mais on dois remettre ateApple a false, sinon el continue a grandir infiniment*/
+          this.ateApple=false;
+        }
+            
+      
     };
+
     this.setDirection = function(newDirection)
     {
       var allowedDirections;
@@ -140,14 +160,16 @@ window.onload = function() {
         }
         
         /*verification si corps(rest collissionne avec soi même) 
-        les cases du corps dont sous forme de tableau*/
-        for(var i=0; i< rest.lenght; i++)
+        les cases du corps dont sous forme de tableau
+        on verifie si la tete du serpent est egal a un des elements du reste du corps*/
+        for(var i=0; i < rest.length; i++)
           {
               /* [[6,4], [5,4], [4,4]] position actuel du snakee
                 [6,4] corresponds a la tête et [5,4], [4,4] au reste (corps)*/            
               /* on boucle sur le corps pour verifier que la 
                 tete ne soit pas a l'emplacement precis (coordones x,y)
-                d'un carreau du corps*/
+                d'un carreau du corps
+                snakeX et snakeY corresponds a la tête*/
 
               if(snakeX === rest[i][0] && snakeY === rest[i][1])
                 {
@@ -156,8 +178,8 @@ window.onload = function() {
                 
                   snakeCollission = true;
                 }
-          }
-          return wallCollission || snakeCollission;
+            }
+            return wallCollission || snakeCollission;
     };
 
     this.isEatingApple = function(appleToEat)
