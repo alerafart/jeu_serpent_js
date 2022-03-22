@@ -21,6 +21,7 @@ window.onload = function() {
     ctx = canvas.getContext('2d');
     snakee = new Snake([[6,4], [5,4], [4,4]], "right");
     applee = new Apple([10,10]);
+    score = 0;
     refreshCanvas();
   }
 
@@ -35,6 +36,7 @@ window.onload = function() {
         if(snakee.isEatingApple(applee))
         {
           /* le serpent a mangé la pomme*/
+          score++;
           snakee.ateApple = true;
           /* quand le serpent mange la pomme on lui donne une nouvelle position
           */
@@ -50,6 +52,7 @@ window.onload = function() {
         ctx.clearRect(0,0, canvasWidth, canvasHeight);    
         snakee.draw();
         applee.draw();
+        drawScore();
         setTimeout(refreshCanvas, delay);
       }
     
@@ -58,7 +61,6 @@ window.onload = function() {
   function gameOver()
   {
     ctx.save();
-
     ctx.fillText("Game Over", 5, 15);
     ctx.fillText("Appuyez sur la touche Espace pour rejouer", 5, 30);
     ctx.restore();
@@ -67,7 +69,14 @@ window.onload = function() {
   {
     snakee = new Snake([[6,4], [5,4], [4,4]], "right");
     applee = new Apple([10,10]);
+    score = 0;
     refreshCanvas();
+  }
+  function drawScore()
+  {
+    ctx.save();
+    ctx.fillText(score.toString(), 5, canvasHeight - 5 );
+    ctx.restore();
   }
   function drawBlock(ctx, position)
   {
