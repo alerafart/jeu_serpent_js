@@ -19,7 +19,7 @@ window.onload = function() {
     canvas.style.border = "1px solid";
     document.body.appendChild(canvas);
     ctx = canvas.getContext('2d');
-    snakee = new Snake([[6,4], [5,4], [4,4], [3,4], [2,4]], "right");
+    snakee = new Snake([[6,4], [5,4], [4,4]], "right");
     applee = new Apple([10,10]);
     refreshCanvas();
   }
@@ -28,7 +28,7 @@ window.onload = function() {
     snakee.advance();
     if (snakee.checkCollission())
       {
-        //Game OVER
+        gameOver();
       }
       else
       {
@@ -55,6 +55,20 @@ window.onload = function() {
     
   }
   
+  function gameOver()
+  {
+    ctx.save();
+
+    ctx.fillText("Game Over", 5, 15);
+    ctx.fillText("Appuyez sur la touche Espace pour rejouer", 5, 30);
+    ctx.restore();
+  }
+  function restart()
+  {
+    snakee = new Snake([[6,4], [5,4], [4,4]], "right");
+    applee = new Apple([10,10]);
+    refreshCanvas();
+  }
   function drawBlock(ctx, position)
   {
     var x = position[0] * blockSize;
@@ -202,6 +216,8 @@ window.onload = function() {
     /* function qui dessine la pomme */
     this.draw = function()
       {
+        /* enregistre params de configuration
+        du contexte du canvas*/
         ctx.save();
         ctx.fillStyle ="#33cc33";
         ctx.beginPath();
@@ -262,6 +278,9 @@ window.onload = function() {
       case "ArrowDown":
         newDirection = "down";
           break;
+      case " ":
+        restart();
+        return;
       default:
         return;
     }
