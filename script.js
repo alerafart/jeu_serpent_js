@@ -185,30 +185,30 @@ window.onload = function() {
       var isNotBetweenHorizontalWalls = snakeX < minX || snakeX  >maxX;
       var isNotBetweenVerticalWalls = snakeY < minY || snakeY  > maxY;
 
-       /*verification si tete du serpent(head)sors du canvas dessiné) */
-        if(isNotBetweenHorizontalWalls || isNotBetweenVerticalWalls){
-          wallCollission = true;
-          }
+      /*verification si tete du serpent(head)sors du canvas dessiné) */
+      if(isNotBetweenHorizontalWalls || isNotBetweenVerticalWalls){
+        wallCollission = true;
+      }
         
-        /*verification si corps(rest collissionne avec soi même) 
-        les cases du corps dont sous forme de tableau
-        on verifie si la tete du serpent est egal a un des elements du reste du corps*/
-        for(var i=0; i < rest.length; i++) {
-          /* [[6,4], [5,4], [4,4]] position actuel du snakee
-            [6,4] corresponds a la tête et [5,4], [4,4] au reste (corps)*/            
-          /* on boucle sur le corps pour verifier que la 
-            tete ne soit pas a l'emplacement precis (coordones x,y)
-            d'un carreau du corps
-            snakeX et snakeY corresponds a la tête*/
+      /*verification si corps(rest collissionne avec soi même) 
+      les cases du corps dont sous forme de tableau
+      on verifie si la tete du serpent est egal a un des elements du reste du corps*/
+      for(var i=0; i < rest.length; i++) {
+        /* [[6,4], [5,4], [4,4]] position actuel du snakee
+          [6,4] corresponds a la tête et [5,4], [4,4] au reste (corps)*/            
+        /* on boucle sur le corps pour verifier que la 
+          tete ne soit pas a l'emplacement precis (coordones x,y)
+          d'un carreau du corps
+          snakeX et snakeY corresponds a la tête*/
 
-          if(snakeX === rest[i][0] && snakeY === rest[i][1]){
-              /* i est l'index de la partie du corps ou on boucle
-              [0] est l axe de x (horizontale) et [1] corresponds a l'axe Y vertical*/                
-              snakeCollission = true;
-            }
+        if(snakeX === rest[i][0] && snakeY === rest[i][1]){
+          /* i est l'index de la partie du corps ou on boucle
+          [0] est l axe de x (horizontale) et [1] corresponds a l'axe Y vertical*/                
+          snakeCollission = true;
         }
-        return wallCollission || snakeCollission;
-      };
+      }
+      return wallCollission || snakeCollission;
+    };
 
     this.isEatingApple = function(appleToEat){
       var head = this.body[0];
