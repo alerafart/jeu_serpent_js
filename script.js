@@ -9,6 +9,8 @@ window.onload = function() {
   var applee;
   var widthInBlocks = canvasWidth/blockSize;
   var heightInBlocks = canvasHeight/blockSize;
+  var score;
+  var timeout;
 
   init();
 
@@ -30,40 +32,36 @@ window.onload = function() {
 
   function refreshCanvas(){
     snakee.advance();
-    if (snakee.checkCollission())
-      {
+
+      if (snakee.checkCollission()){
         gameOver();
       }
-      else
-      {
-        if(snakee.isEatingApple(applee))
-        {
+      else {
+        if(snakee.isEatingApple(applee)){
           /* le serpent a mangé la pomme*/
           score++;
           snakee.ateApple = true;
           /* quand le serpent mange la pomme on lui donne une nouvelle position
           */
-          do
-          {
+          do{
             applee.setNewPosition();
           }
           /*tant que la new position tombe sur le serpent la boucle continue
           jusqu'a que la new position ne tombe pas sur le corps du serpent*/
-          while(applee.isOnSnake(snakee))
-          
+          while(applee.isOnSnake(snakee));          
         }
+
         ctx.clearRect(0,0, canvasWidth, canvasHeight);
         drawScore();
         snakee.draw();
         applee.draw();
-        
-        setTimeout(refreshCanvas, delay);
+        timeout = setTimeout(refreshCanvas, delay);        
+        /*setTimeout(refreshCanvas, delay) refais refresh canvas apres un certain delai*/
       }
     
   }
   
-  function gameOver()
-  {
+  function gameOver(){
     ctx.save();
     ctx.font = "bold 70px sans-serif";
     ctx.fillStyle = "black";
@@ -80,15 +78,14 @@ window.onload = function() {
     ctx.fillText("Appuyez sur la touche Espace pour rejouer",centreX, centreY -120);
     ctx.restore();
   }
-  function restart()
-  {
+  function restart(){
     snakee = new Snake([[6,4], [5,4], [4,4]], "right");
     applee = new Apple([10,10]);
     score = 0;
+    clearTimeout(timeout);
     refreshCanvas();
   }
-  function drawScore()
-  {
+  function drawScore(){
     ctx.save();
     ctx.font = "bold 200px sans-serif";
     ctx.fillStyle = "gray";
@@ -101,8 +98,7 @@ window.onload = function() {
     ctx.fillText(score.toString(), centreX, centreY, canvasHeight - 5 );
     ctx.restore();
   }
-  function drawBlock(ctx, position)
-  {
+  function drawBlock(ctx, position){
     var x = position[0] * blockSize;
     var y = position[1] * blockSize;
     ctx.fillRect(x,y, blockSize, blockSize);
@@ -112,12 +108,10 @@ window.onload = function() {
     this.body = body;
     this.direction = direction;
     this.ateApple = false;
-    this.draw = function()
-    {
+    this.draw = function(){
       ctx.save();
       ctx.fillStyle = "#ff0000";
-      for(var i = 0; i<this.body.length; i++)
-      {
+      for(var i = 0; i<this.body.length; i++){
         drawBlock(ctx, this.body[i]);
       }
       ctx.restore();
@@ -127,11 +121,9 @@ window.onload = function() {
      *  methode qui fais avancer le serpent
      * on avance la tête d'une position et on enleve le dernier morceau/block avec pop
      */
-    this.advance = function()
-    {
+    this.advance = function(){
       var nextPosition = this.body[0].slice();
-      switch(this.direction)
-      {
+      switch(this.direction){
         case "left":
           nextPosition[0] -= 1;
           break;
@@ -148,8 +140,8 @@ window.onload = function() {
           throw("Invalid Direction");
       }
       this.body.unshift(nextPosition);
-      if(!this.ateApple)
-        {/* si le serpent ne mange pas de pomme on 
+      if(!this.ateApple){
+          /* si le serpent ne mange pas de pomme on 
           supprime le dernier block lors qu'elle
           avance, taille ne bouge pas*/
           this.body.pop();
@@ -160,15 +152,11 @@ window.onload = function() {
           mais on dois remettre ateApple a false, sinon el continue a grandir infiniment*/
           this.ateApple=false;
         }
-            
-      
     };
 
-    this.setDirection = function(newDirection)
-    {
+    this.setDirection = function(newDirection){
       var allowedDirections;
-      switch(this.direction)
-      {
+      switch(this.direction){
         case "left":
         case "right":
           allowedDirections = ["up", "down"];
@@ -178,14 +166,12 @@ window.onload = function() {
             allowedDirections = ["left", "right"];
             break;               
       }
-      if(allowedDirections.indexOf(newDirection)>-1)
-      {
+      if(allowedDirections.indexOf(newDirection)>-1){
         this.direction = newDirection;
       }
     }
 
-    this.checkCollission = function()
-    {
+    this.checkCollission = function(){
       var wallCollission =false;
       var snakeCollission = false;
       var head = this.body[0];
@@ -200,104 +186,89 @@ window.onload = function() {
       var isNotBetweenVerticalWalls = snakeY < minY || snakeY  > maxY;
 
        /*verification si tete du serpent(head)sors du canvas dessiné) */
-      if(isNotBetweenHorizontalWalls || isNotBetweenVerticalWalls)
-        {
+        if(isNotBetweenHorizontalWalls || isNotBetweenVerticalWalls){
           wallCollission = true;
-        }
+          }
         
         /*verification si corps(rest collissionne avec soi même) 
         les cases du corps dont sous forme de tableau
         on verifie si la tete du serpent est egal a un des elements du reste du corps*/
-        for(var i=0; i < rest.length; i++)
-          {
-              /* [[6,4], [5,4], [4,4]] position actuel du snakee
-                [6,4] corresponds a la tête et [5,4], [4,4] au reste (corps)*/            
-              /* on boucle sur le corps pour verifier que la 
-                tete ne soit pas a l'emplacement precis (coordones x,y)
-                d'un carreau du corps
-                snakeX et snakeY corresponds a la tête*/
+        for(var i=0; i < rest.length; i++) {
+          /* [[6,4], [5,4], [4,4]] position actuel du snakee
+            [6,4] corresponds a la tête et [5,4], [4,4] au reste (corps)*/            
+          /* on boucle sur le corps pour verifier que la 
+            tete ne soit pas a l'emplacement precis (coordones x,y)
+            d'un carreau du corps
+            snakeX et snakeY corresponds a la tête*/
 
-              if(snakeX === rest[i][0] && snakeY === rest[i][1])
-                {
-                  /* i est l'index de la partie du corps ou on boucle
-                  [0] est l axe de x (horizontale) et [1] corresponds a l'axe Y vertical*/
-                
-                  snakeCollission = true;
-                }
+          if(snakeX === rest[i][0] && snakeY === rest[i][1]){
+              /* i est l'index de la partie du corps ou on boucle
+              [0] est l axe de x (horizontale) et [1] corresponds a l'axe Y vertical*/                
+              snakeCollission = true;
             }
-            return wallCollission || snakeCollission;
-    };
+        }
+        return wallCollission || snakeCollission;
+      };
 
-    this.isEatingApple = function(appleToEat)
-    {
+    this.isEatingApple = function(appleToEat){
       var head = this.body[0];
-      if (head[0] === appleToEat.position[0] && head[1] === appleToEat.position[1])
-      {
+      if (head[0] === appleToEat.position[0] && head[1] === appleToEat.position[1]){
         return true;
       }
-      else
-      {
+      else{
         return false;
       }
     };
   }
 
-  function Apple(position)
-  {
+  function Apple(position){
     this.position = position;
     /* function qui dessine la pomme */
-    this.draw = function()
-      {
-        /* enregistre params de configuration
-        du contexte du canvas*/
-        ctx.save();
-        ctx.fillStyle ="#33cc33";
-        ctx.beginPath();
-        var radius = blockSize/2;
-        var x = this.position[0]*blockSize + radius;
-        var y = this.position[1]*blockSize + radius;
-        ctx.arc(x,y, radius, 0, Math.PI*2, true);
-        ctx.fill();
-        ctx.restore();
-      };
+    this.draw = function(){
+      /* enregistre params de configuration
+      du contexte du canvas*/
+      ctx.save();
+      ctx.fillStyle ="#33cc33";
+      ctx.beginPath();
+      var radius = blockSize/2;
+      var x = this.position[0]*blockSize + radius;
+      var y = this.position[1]*blockSize + radius;
+      ctx.arc(x,y, radius, 0, Math.PI*2, true);
+      ctx.fill();
+      ctx.restore();
+    };
 
      /* si la pomme est mangé par le serpent cette function
       va la replacer a un autre endroit de façon aleatoire*/
-     this.setNewPosition = function()
-     {
-       /**
-        * math.random donne une chiffre aleatoire entre 0 et 1 
-        * qu'on dois ensuite multiplier par la largeur du tableau
-        * on obtiendra un chiffre non entiens donc avec math.round on obtiens un chiffre entier
-        */
-       var newX = Math.round (Math.random() * (widthInBlocks-1));
-       var newY = Math.round (Math.random() * (heightInBlocks-1));
-       this.position = [newX, newY];
-     };
+    this.setNewPosition = function(){
+      /**
+      * math.random donne une chiffre aleatoire entre 0 et 1 
+      * qu'on dois ensuite multiplier par la largeur du tableau
+      * on obtiendra un chiffre non entiens donc avec math.round on obtiens un chiffre entier
+      */
+      var newX = Math.round (Math.random() * (widthInBlocks-1));
+      var newY = Math.round (Math.random() * (heightInBlocks-1));
+      this.position = [newX, newY];
+    };
      /* methode qui va verifier si la nouvelle pomme est recrée sur le corps
       du serpent */
-     this.isOnSnake = function(snakeToCheck)
-     {
-        var isOnSnake = false;
-        /*on va boucler sur tout le corps du serpent */
-        for(var i = 0; i< snakeToCheck.body.lenght; i++)
-        {
-          if(this.position[0] === snakeToCheck.body[i][0] && this.position[1] === snakeToCheck.body[i][1] )
-          {
-            isOnSnake = true;
-          }
+    this.isOnSnake = function(snakeToCheck){
+      var isOnSnake = false;
+      /*on va boucler sur tout le corps du serpent */
+      for(var i = 0; i< snakeToCheck.body.lenght; i++){
+        if(this.position[0] === snakeToCheck.body[i][0] && this.position[1] === snakeToCheck.body[i][1] ){
+          isOnSnake = true;
         }
-        return isOnSnake;
-     }
+      }
+      return isOnSnake;
+    }
     
   }
   
-  document.onkeydown = function handleKeyDown(event)
-  {
+  document.onkeydown = function handleKeyDown(event){
     var key = event.key;
     var newDirection;
-    switch(key)
-    {
+    switch(key){
       case "ArrowLeft":
         newDirection = "left";
           break;
