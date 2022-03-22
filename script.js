@@ -33,6 +33,20 @@ window.onload = function() {
       }
       else
       {
+        if(snakee.isEatingApple(applee))
+        {
+          /* le serpent a mangé la pomme*/
+          /* quand le serpent mange la pomme on lui donne une nouvelle position
+          */
+          do
+          {
+            applee.setNewPosition();
+          }
+          /*tant que la new position tombe sur le serpent la boucle continue
+          jusqu'a que la new position ne tombe pas sur le corps du serpent*/
+          while(applee.isOnSnake(snakee))
+          
+        }
         ctx.clearRect(0,0, canvasWidth, canvasHeight);    
         snakee.draw();
         applee.draw();
@@ -146,23 +160,65 @@ window.onload = function() {
           return wallCollission || snakeCollission;
     };
 
+    this.isEatingApple = function(appleToEat)
+    {
+      var head = this.body[0];
+      if (head[0] === appleToEat.position[0] && head[1] === appleToEat.position[1])
+      {
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    };
   }
 
   function Apple(position)
   {
     this.position = position;
+    /* function qui dessine la pomme */
     this.draw = function()
       {
         ctx.save();
         ctx.fillStyle ="#33cc33";
         ctx.beginPath();
         var radius = blockSize/2;
-        var x = position[0]*blockSize + radius;
-        var y = position[1]*blockSize + radius;
+        var x = this.position[0]*blockSize + radius;
+        var y = this.position[1]*blockSize + radius;
         ctx.arc(x,y, radius, 0, Math.PI*2, true);
         ctx.fill();
         ctx.restore();
       };
+
+     /* si la pomme est mangé par le serpent cette function
+      va la replacer a un autre endroit de façon aleatoire*/
+     this.setNewPosition = function()
+     {
+       /**
+        * math.random donne une chiffre aleatoire entre 0 et 1 
+        * qu'on dois ensuite multiplier par la largeur du tableau
+        * on obtiendra un chiffre non entiens donc avec math.round on obtiens un chiffre entier
+        */
+       var newX = Math.round (Math.random() * (widthInBlocks-1));
+       var newY = Math.round (Math.random() * (heightInBlocks-1));
+       this.position = [newX, newY];
+     };
+     /* methode qui va verifier si la nouvelle pomme est recrée sur le corps
+      du serpent */
+     this.isOnSnake = function(snakeToCheck)
+     {
+        var isOnSnake = false;
+        /*on va boucler sur tout le corps du serpent */
+        for(var i = 0; i< snakeToCheck.body.lenght; i++)
+        {
+          if(this.position[0] === snakeToCheck.body[i][0] && this.position[1] === snakeToCheck.body[i][1] )
+          {
+            isOnSnake = true;
+          }
+        }
+        return isOnSnake;
+     }
     
   }
   
